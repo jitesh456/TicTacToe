@@ -1,7 +1,10 @@
-#!/bin/bash 
+#!/bin/bash  -x
+#constant
+X=1
+O=1
 echo "Welcome to Tic tac toe"
 declare -A board
-function	initializeBoard()
+function initializeBoard()
 {
 	for((row=0;row<3;row++))
 	do
@@ -11,7 +14,7 @@ function	initializeBoard()
 		done
 	done
 }
-function	displayBoard()
+function displayBoard()
 {
 	for((row=0;row<3;row++))
 	do
@@ -22,5 +25,16 @@ function	displayBoard()
 		echo -e
 	done
 }
+function assignLetter()
+{
+	if(( $((RANDOM %2)) == 1))
+	then
+		player="X"
+	else
+		player="O"
+	fi
+}
 initializeBoard
 displayBoard
+assignLetter
+

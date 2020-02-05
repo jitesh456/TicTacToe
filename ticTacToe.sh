@@ -30,6 +30,7 @@ function toss()
 	if(( $((RANDOM %2)) == 1))
 	then
 		player="X"
+		echo "player will play first"
 	else
 		player="O"
 	fi

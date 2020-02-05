@@ -25,7 +25,7 @@ function displayBoard()
 		echo -e
 	done
 }
-function assignLetter()
+function toss()
 {
 	if(( $((RANDOM %2)) == 1))
 	then
@@ -36,5 +36,5 @@ function assignLetter()
 }
 initializeBoard
 displayBoard
-assignLetter
+toss
 

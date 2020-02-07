@@ -5,12 +5,19 @@ O=1
 ROW=3
 COLUMN=3
 ALL_CELL_OCCUPIED=9
+WIN=1
+OCCUPIED=0
+UNOCCUPIED=1
+PLAYED=1
+NOT_PLAYED=0
 #variable
 player="O"
 computer="O"
-flag=0
+isEmptyFlag=0
+madeMoveFlag=0
 move=0
 turn=0
+winFlag=0
 echo "Welcome to Tic tac toe"
 #Initialize Board
 declare -A board
@@ -53,7 +60,7 @@ function isEmpty()
 {
 	if [[ ${board[$1,$2]} == "-" ]]
 	then
-		flag=1
+		isEmptyFlag=$UNOCCUPIED
 		((move++))
 	fi
 }
@@ -85,13 +92,14 @@ function checkWinner()
             ((rightDiagonal++))
 			fi
 #left Diagonal
-			if [[ $(($row + $column))==$ROW && ${board[$row,$column]} == $sign ]]
+			if [[ $(($row + $column)) -eq $ROW && ${board[$row,$column]} == $sign ]]
 			then
 				((leftDiagonal++))
 			fi
 			if [[ $rowCount -eq $COLUMN || $columnCount -eq $COLUMN || $rightDiagonal -eq $COLUMN || $leftDiagonal -eq $COLUMN ]]
 			then
 				echo $sign :"Winner"
+				winFlag=$WIN
 				exit
 			fi
 		done
@@ -102,9 +110,11 @@ function playMove()
 {
 #check  is empty
 	isEmpty $1 $2
-	if [[ $flag == 1 ]]
+	if [[ $isEmptyFlag == $UNOCCUPIED ]]
 	then
 		board[$row,$column]=$3
+		isEmptyFlag=$OCCUPIED
+		madeMoveFlag=$PLAYED
 	fi
 }
 function playFirst()
@@ -121,35 +131,34 @@ function playFirst()
 }
 function playerMove()
 {
-	read -p "provide  row no like 0,1,2" row
-	read -p "provide  col no like 0,1,2" column
-	#check for valid condiation
-	if (( $row > $ROW && $column > $COLUMN ))
-	then
-		echo "Not a valid row or column"
-	fi
+	madeMoveFlag=$NOT_PLAYED
+	while (( $madeMoveFlag == $NOT_PLAYED ))
+	do
+		read -p "provide  row no like 0,1,2" row
+		read -p "provide  col no like 0,1,2" column
+		#check for valid condiation
+		if (( $row > $ROW && $column > $COLUMN ))
+		then
+			echo "Not a valid row or column"
+		fi
 		playMove $row $column $player
+	done
 }
 function computerMove()
 {
-
-	row=$((RANDOM%3))
-	column=$((RANDOM%3))
-	isEmpty $row $column
-	if [[ $flag == 1 ]]
-	then
+	madeMoveFlag=$NOT_PLAYED
+	while (( $madeMoveFlag == $NOT_PLAYED ))
+	do
+		row=$((RANDOM%3))
+		column=$((RANDOM%3))
 		playMove $row $column $computer
-	fi
+	done
 }
-function playFirst()
+function tie()
 {
-	if [[ $player == "X" ]]
+	if (( $winFlag != $WIN ))
 	then
-		playerMove
-		turn=$computer
-	else
-		computerMove
-		turn=$player
+		echo "Tie"
 	fi
 }
 initializeBoard
@@ -169,9 +178,6 @@ do
 	displayBoard
 	checkWinner $computer
 	checkWinner $player
-	if (($ALL_CELL_OCCUPIED == $move))
-	then
-		echo "tie"
-		exit
-	fi
 done
+
+tie

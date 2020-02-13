@@ -123,7 +123,7 @@ function checkWinner(){
 				winFlag=1
 			fi
 		done
-   done
+	done
 }
 
 
@@ -157,49 +157,29 @@ function playerMove(){
 }
 
 #check If computer can win
-function  checkForWinCondition(){
+function  checkForWinAndBlockCondition(){
+	local sign=$1
 	local rows
 	local columns
-	for (( rows=0; rows<$ROW; rows++ ))
-	do
-		for (( columns=0; columns<$COLUMN; columns++ ))
-		do
-			if [[ ${board[$rows,$columns]} == "-" ]]
-			then
-				board[$rows,$columns]=$computer
-				checkWinner $computer
-				if [ $winFlag -ne 1 ]
-				then
-					board[$rows,$columns]="-"
-				else
-					displayBoard
-					displayWinner $computer
-				fi
-			fi
-		done
-	done
-}
-
-# check if player can win and block  the player
-function  blockFromWinning(){
+	block=0
 	madeMoveFlag=0
-	local rows
-	local columns
 	for (( rows=0; rows<$ROW; rows++ ))
 	do
 		for (( columns=0; columns<$COLUMN; columns++ ))
 		do
 			if [[ ${board[$rows,$columns]} == "-" ]]
 			then
-				board[$rows,$columns]=$player
-				checkWinner $player
-				if [ $winFlag -eq 1 ]
+				board[$rows,$columns]=$sign
+				checkWinner $sign
+				if [[ $winFlag -eq 1 &&  $sign == $computer ]]
+				then
+					 displayWinner $sign
+				elif [[ $winFlag -eq 1 && $sign == $player ]]
 				then
 					board[$rows,$columns]=$computer
 					block=1
-					((move++))
+ 					((move++))
 					winFlag=0
-					displayWinner
 					break
 				else
 					board[$rows,$columns]="-"
@@ -256,6 +236,7 @@ function checkSide()
 			echo "one two " $rows $columns
 			playMove $rows $columns $computer
 		fi
+
 		if [ $madeMoveFlag -eq 0 ]
 		then
 			echo "swap " $columns $rows
@@ -280,20 +261,20 @@ do
 		checkWinner $player
 		displayWinner $player
 	else
-		clear		
-		checkForWinCondition
-		blockFromWinning
+		clear
+		checkForWinAndBlockCondition $computer
+		checkForWinAndBlockCondition $player
 		if [ $madeMoveFlag -eq 0 ]
 		then
 			checkCorner
-			madeMoveFlag=1
 		fi
+
 		if [ $madeMoveFlag -eq 0 ]
 		then
 			row=$(($(($ROW-1))/2))
 			playMove $row $row $computer
 		fi
-		echo $madeMoveFlag
+
 		if [ $madeMoveFlag -eq 0 ]
 		then
 			checkSide

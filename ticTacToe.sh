@@ -1,4 +1,4 @@
-#!/bin/bash   
+#!/bin/bash 
 #constant
 X=1
 O=1
@@ -33,19 +33,15 @@ function initializeBoard(){
 }
 #displayBoard
 function displayBoard(){
-	echo "Player:"$player
-	echo "Computer"$computer
 	for((row=0;row<$ROW;row++))
 	do
-		echo "=============="
 		for((column=0;column<$COLUMN;column++))
 		do
-			echo -n "|" ${board[$row,$column]} " "
+			echo -n ${board[$row,$column]} " "
 		done
-		echo -e 
-
+		echo -e
 	done
-	echo   "=============="
+	echo "===========END============"
 }
 #Assign letter and decide who will play first
 function toss(){
@@ -81,7 +77,7 @@ function playMove(){
 	isEmpty $1 $2
 	if [[ $isEmptyFlag == $UNOCCUPIED ]]
 	then
-		board[$row,$column]=$3
+		board[$1,$2]=$3
 		isEmptyFlag=$OCCUPIED
 		madeMoveFlag=$PLAYED
 	fi
@@ -100,7 +96,7 @@ function checkWinner(){
 			if [[ ${board[$row,$column]} == $sign ]]
 			then
 				((rowCount++))
-			fi
+         fi
 			#col check
 			if [[ ${board[$column,$row]} == $sign ]]
 			then
@@ -108,7 +104,7 @@ function checkWinner(){
 			fi
 			#rightDiagonal
 			if [[ $row -eq $column && ${board[$row,$column]} == $sign ]]
-			then
+			then	
 				((rightDiagonal++))
 			fi
 			#left Diagonal
@@ -116,12 +112,13 @@ function checkWinner(){
 			then
 				((leftDiagonal++))
 			fi
+			#right Diagonal
 			if [[ $rowCount -eq 3 || $columnCount -eq 3 || $rightDiagonal -eq 3 || $leftDiagonal -eq 3 ]]
 			then
 				winFlag=$WIN
 			fi
 		done
-	done
+   done
 }
 
 function playFirst(){
@@ -219,7 +216,7 @@ function checkCorner()
 			then
 				break	
 			fi		
-			playMove $row $column $computer
+				playMove $row $column $computer
 		done
 		if [ $madeMoveFlag -eq $PLAYED ]
 		then
@@ -237,8 +234,6 @@ do
 	then
 		playerMove
 		turn=$computer
-		checkWinner $player
-		displayWinner $player
 	else
 		checkForWinCondition
 		blockFromWinning
@@ -246,9 +241,11 @@ do
 		then
 			checkCorner
 		fi
+		if [ $madeMoveFlag -eq 0 ]
+		then
+			playMove 1 1 $computer
+		fi
 		turn=$player
-		checkWinner $player
-		displayWinner $player
 		block=0
 	fi
 	displayBoard

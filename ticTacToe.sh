@@ -1,4 +1,4 @@
-#!/bin/bash  
+#!/bin/bash   
 #constant
 X=1
 O=1
@@ -33,15 +33,19 @@ function initializeBoard(){
 }
 #displayBoard
 function displayBoard(){
+	echo "Player:"$player
+	echo "Computer"$computer
 	for((row=0;row<$ROW;row++))
 	do
+		echo "=============="
 		for((column=0;column<$COLUMN;column++))
 		do
-			echo -n ${board[$row,$column]} " "
+			echo -n "|" ${board[$row,$column]} " "
 		done
-		echo -e
+		echo -e 
+
 	done
-	echo "===========END============"
+	echo   "=============="
 }
 #Assign letter and decide who will play first
 function toss(){
@@ -81,8 +85,6 @@ function playMove(){
 		isEmptyFlag=$OCCUPIED
 		madeMoveFlag=$PLAYED
 	fi
-	checkWinner $3
-	displayWinner $3
 }
 function checkWinner(){
 	sign=$1
@@ -90,15 +92,15 @@ function checkWinner(){
 	rightDiagonal=0
 	for((row=0;row<3;row++))
 	do
-	rowCount=0
-	columnCount=0
+		rowCount=0
+		columnCount=0
 		for((column=0;column<3;column++))
 		do
 			#row check
-         if [[ ${board[$row,$column]} == $sign ]]
+			if [[ ${board[$row,$column]} == $sign ]]
 			then
 				((rowCount++))
- 			fi
+			fi
 			#col check
 			if [[ ${board[$column,$row]} == $sign ]]
 			then
@@ -128,7 +130,7 @@ function playFirst(){
 		playerMove
 		turn=$computer
 	else
-		computerMove
+		checkCorner
 		turn=$player
 	fi
 	displayBoard
@@ -146,16 +148,6 @@ function playerMove()
 			echo "Not a valid row or column"
 		fi
 		playMove $row $column $player
-	done
-}
-function computerMove(){
-
-	madeMoveFlag=$NOT_PLAYED
-	while (( $madeMoveFlag == $NOT_PLAYED ))
-	do
-		row=$((RANDOM%3))
-		column=$((RANDOM%3))
-		playMove $row $column $computer
 	done
 }
 function  checkForWinCondition(){
@@ -184,7 +176,7 @@ function  blockFromWinning(){
 	local rows
 	local columns
 	for (( rows=0; rows<$ROW; rows++ ))
- 	do
+	do
 		for (( columns=0; columns<$COLUMN; columns++ ))
 		do
 			if [[ ${board[$rows,$columns]} == "-" ]]
@@ -216,6 +208,26 @@ function tie(){
 		echo "Tie"
 	fi
 }
+function checkCorner()
+{
+	madeMoveFlag=$NOT_PLAYED
+	for ((row=0;row<$ROW;row+=2))
+	do
+		for((column=0;column<$COLUMN;column+=2))
+		do
+			if [ $madeMoveFlag -eq $PLAYED ]
+			then
+				break	
+			fi		
+			playMove $row $column $computer
+		done
+		if [ $madeMoveFlag -eq $PLAYED ]
+		then
+			break 
+		fi 
+	done
+
+}
 initializeBoard
 toss
 playFirst
@@ -225,14 +237,18 @@ do
 	then
 		playerMove
 		turn=$computer
+		checkWinner $player
+		displayWinner $player
 	else
 		checkForWinCondition
 		blockFromWinning
 		if [ $block -ne 1 ]
 		then
-			computerMove 
+			checkCorner
 		fi
 		turn=$player
+		checkWinner $player
+		displayWinner $player
 		block=0
 	fi
 	displayBoard
